@@ -6,11 +6,13 @@ import { prisma } from "@/lib/db";
 import AccountMenu from "@/components/account-menu";
 import Search from "@/components/search";
 
-const NAV = [
-  ["Jobs for you", "/jobs"], ["Matches", "/matches"], ["Hiring", "/hire"],
-  ["Chat", "/chat"], ["For you", "/for-you"], ["Powers", "/powers/routines"],
-  ["Explore", "/explore"], ["Wiki", "/wiki"], ["Library", "/library"],
-  ["Teams", "/teams"], ["Shared with me", "/shared"], ["Referrals", "/referrals"], ["Pricing", "/pricing"],
+const NAV: [string, string, string][] = [
+  // group, label, href
+  ["Work", "Jobs for you", "/jobs"], ["Work", "Matches", "/matches"], ["Work", "Hiring", "/hire"],
+  ["Assistant", "Chat", "/chat"], ["Assistant", "For you", "/for-you"], ["Assistant", "Activity", "/logs"], ["Assistant", "Powers", "/powers/routines"], ["Assistant", "Explore", "/explore"],
+  ["Knowledge", "Wiki", "/wiki"], ["Knowledge", "Library", "/library"],
+  ["Teams", "Teams", "/teams"], ["Teams", "Shared with me", "/shared"], ["Teams", "Referrals", "/referrals"],
+  ["Account", "Settings", "/settings"], ["Account", "Pricing", "/pricing"],
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -21,10 +23,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (user && !user.onboardingDone) redirect("/onboarding");
   return (
     <div className="flex h-screen">
-      <aside className="w-56 shrink-0 border-r bg-white p-4 flex flex-col gap-1">
-        <div className="mb-3 font-semibold">Ari</div>
-        {NAV.map(([label, href]) => <Link key={href} href={href}
-          className="rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100">{label}</Link>)}
+      <aside className="w-56 shrink-0 border-r p-4 flex flex-col gap-1 transition-v"
+        style={{ background: "var(--card)", borderColor: "var(--line)" }}>
+        <div className="mb-3 font-semibold" style={{ color: "var(--graphite)" }}>Vouch</div>
+        {(["Work", "Assistant", "Knowledge", "Teams", "Account"] as const).map(g => (
+          <div key={g} className="mt-2 first:mt-0">
+            <p className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>{g}</p>
+            {NAV.filter(([, , href]) => NAV.find(n => n[0] === g && n[2] === href)).filter(n => n[0] === g)
+              .map(([, label, href]) => <Link key={href} href={href}
+                className="block rounded-lg px-3 py-1.5 text-sm transition-v hover:opacity-70"
+                style={{ color: "var(--ink)" }}>{label}</Link>)}
+          </div>
+        ))}
         <Search />
         <div className="mt-auto">
           <AccountMenu email={user?.email ?? ""} plan={user?.plan ?? "free"}

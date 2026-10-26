@@ -45,7 +45,7 @@ export default async function PublicAgentPage({ params }: { params: { publicSlug
         </div>
         <div>
           <h1 className="text-2xl font-semibold">{a.name}</h1>
-          <p className="text-sm text-neutral-500">Agent for {ownerName}</p>
+          <p className="text-sm" style={{ color: "var(--ink-2)" }}>Agent for {ownerName}</p>
           {a.capacity
             ? <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Open to new work</span>
@@ -54,42 +54,42 @@ export default async function PublicAgentPage({ params }: { params: { publicSlug
         </div>
       </div>
 
-      {a.tagline && <p className="mt-6 text-lg text-neutral-700">&ldquo;{a.tagline}&rdquo;</p>}
+      {a.tagline && <p className="mt-6 text-lg" style={{ color: "var(--ink)" }}>&ldquo;{a.tagline}&rdquo;</p>}
 
       {/* Right now */}
       {(a.capacity || a.openTo.length > 0 || a.notOpenTo.length > 0) && (
         <section className="mt-10">
-          <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-400">Right now</h2>
+          <h2 className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>Right now</h2>
           <dl className="mt-3 space-y-2 text-sm">
-            {a.capacity && <div className="flex gap-3"><dt className="w-20 shrink-0 text-neutral-400">Capacity</dt><dd>{a.capacity}</dd></div>}
-            {a.openTo.length > 0 && <div className="flex gap-3"><dt className="w-20 shrink-0 text-neutral-400">Open to</dt><dd>{a.openTo.join(" · ")}</dd></div>}
-            {a.notOpenTo.length > 0 && <div className="flex gap-3"><dt className="w-20 shrink-0 text-neutral-400">Not</dt><dd className="text-neutral-500">{a.notOpenTo.join(" · ")}</dd></div>}
+            {a.capacity && <div className="flex gap-3"><dt className="w-20 shrink-0" style={{ color: "var(--ink-3)" }}>Capacity</dt><dd>{a.capacity}</dd></div>}
+            {a.openTo.length > 0 && <div className="flex gap-3"><dt className="w-20 shrink-0" style={{ color: "var(--ink-3)" }}>Open to</dt><dd>{a.openTo.join(" · ")}</dd></div>}
+            {a.notOpenTo.length > 0 && <div className="flex gap-3"><dt className="w-20 shrink-0" style={{ color: "var(--ink-3)" }}>Not</dt><dd style={{ color: "var(--ink-2)" }}>{a.notOpenTo.join(" · ")}</dd></div>}
           </dl>
         </section>
       )}
 
       {/* Work receipts */}
       <section className="mt-10">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-400">Work receipts</h2>
+        <h2 className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>Work receipts</h2>
         {receipts.length === 0
-          ? <p className="mt-3 text-sm text-neutral-500">No work receipts yet — {a.name} is new.</p>
+          ? <p className="mt-3 text-sm" style={{ color: "var(--ink-2)" }}>No work receipts yet — {a.name} is new.</p>
           : <ul className="mt-3 space-y-3">
               {receipts.map((r, i) => (
-                <li key={i} className="rounded-xl border bg-white p-4">
+                <li key={i} className="card">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-medium">✓ {r.title}</span>
                     {r.coSigners
-                      ? <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">co-signed by {r.coSigners}</span>
-                      : <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">self-declared</span>}
+                      ? <span className="chip chip-verified shrink-0">confirmed by {r.coSigners}</span>
+                      : <span className="chip shrink-0">self-declared</span>}
                   </div>
-                  {r.detail && <p className="mt-1 text-sm text-neutral-500">{r.detail}</p>}
+                  {r.detail && <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>{r.detail}</p>}
                 </li>
               ))}
             </ul>}
       </section>
 
       {/* Intake */}
-      <section className="mt-12 rounded-2xl border bg-white p-6">
+      <section className="card mt-12" style={{ padding: 24 }}>
         <h2 className="text-base font-semibold">Work with {ownerName.split(" ")[0]}</h2>
         <p className="mt-1 text-sm text-neutral-500">{a.name} replies here within a day. {ownerName.split(" ")[0]} only sees it if it&rsquo;s a fit.</p>
         <IntakeForm publicSlug={a.publicSlug!} />

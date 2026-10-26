@@ -1,2 +1,96 @@
 @tailwind base; @tailwind components; @tailwind utilities;
-body { @apply bg-neutral-50 text-neutral-900 antialiased; }
+
+/* Vouch design tokens — town_reference_design_system.md */
+:root {
+  --graphite: #1F1F22;
+  --cream: #F7F4EE;
+  --amber: #F5A524;
+  --amber-soft: #FDF3E0;
+  --card: #FFFFFF;
+  --card-dark: #2A2A2E;
+  --ink: #1A1A1C;
+  --ink-2: #6E6E73;
+  --ink-3: #9C9CA1;
+  --line: #E7E3DA;
+  --line-dark: #3A3A3F;
+  --success: #2E9E6B;
+  --success-soft: #E4F4EC;
+  --danger: #D94848;
+  --inbound: #8B7CF6;
+  --inbound-soft: #EFECFD;
+  --t-fast: 150ms;
+}
+
+body {
+  @apply antialiased;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "SF Pro Text", sans-serif;
+}
+
+/* Semantic components (reskin layer) */
+.btn-primary {
+  @apply rounded-[10px] font-medium text-white transition-colors;
+  background: var(--graphite);
+  height: 44px;
+  padding: 0 16px;
+}
+.btn-primary:hover { background: #333338; }
+.btn-amber {
+  @apply rounded-[10px] font-medium text-white transition-colors;
+  background: var(--amber);
+  height: 44px;
+  padding: 0 16px;
+}
+.btn-amber:hover { background: #DB8F13; }
+.btn-ghost {
+  @apply rounded-[10px] font-medium transition-colors;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  background: transparent;
+  height: 44px;
+  padding: 0 16px;
+}
+.btn-ghost:hover { border-color: var(--ink-3); color: var(--ink); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+.chip {
+  @apply inline-flex items-center rounded-full font-medium;
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--cream);
+  color: var(--ink-2);
+}
+.chip-verified { background: var(--success-soft); color: var(--success); }
+.chip-amber { background: var(--amber-soft); color: #8A5A00; }
+.chip-inbound { background: var(--inbound-soft); color: var(--inbound); }
+
+.input {
+  @apply rounded-[10px] outline-none transition-colors;
+  border: 1px solid var(--line);
+  height: 48px;
+  padding: 0 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 15px;
+}
+.input:focus { border-color: var(--amber); border-width: 1.5px; }
+textarea.input { height: auto; padding: 12px; }
+
+/* Motion */
+.transition-v { transition: all var(--t-fast) ease-out; }
+
+/* Dark mode parity */
+.dark body, body.dark {
+  background: var(--graphite);
+  color: #F2F1EC;
+}
+.dark .card, body.dark .card { background: var(--card-dark); border-color: var(--line-dark); }
+.dark .btn-ghost, body.dark .btn-ghost { border-color: var(--line-dark); color: #A8A8AD; }
+.dark .input, body.dark .input { background: var(--card-dark); border-color: var(--line-dark); color: #F2F1EC; }
+.dark .chip, body.dark .chip { background: var(--line-dark); color: #A8A8AD; }
