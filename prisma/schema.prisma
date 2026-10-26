@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  timezone      String    @default("Europe/Zurich")
+  onboardingDone Boolean  @default(false)
+  plan          String    @default("free")
+  creditsBalance Int     @default(5000)  // trial credits
+  trialEndsAt   DateTime?
+  preferences   Json?     // scheduling prefs, theme, channels
+  accounts      Account[]
+  sessions      Session[]
+  assistant     Assistant?
+  threads       Thread[]
+  routines      Routine[]
+  wikiPages     WikiPage[]
+  people        Person[]
+  notes         Note[]
+  docs          Doc[]
+  logs          AppLog[]
+}
+
+model AppLog {
+  id        String   @id @default(cuid())
+  userId    String
+  source    String   // routine | chat | inbound | system
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Account {  // OAuth account (Google / Microsoft)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String  // "google" | "azure-ad"
+  providerAccountId String
+  access_token      String? @db.Text
+  refresh_token     String? @db.Text
+  expires_at        Int?
+  scope             String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  sessionToken String @unique
+  userId    String
+  expires   DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Assistant {  // the "Townie" equivalent
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  name        String  @default("Assistant")
+  slug        String  @unique   // name@ourdomain.com
+  personality String  @default("Minimal, high-signal, and brief.")
+  avatar      String  @default("neutral")  // our own icon set, not Town's art
+  voiceName   String?
+  // Public agent profile (Vouch page) — see docs/PUBLIC_AGENT_PROFILE.md
+  isPublic      Boolean @default(false)
+  publicSlug    String? @unique      // vouch.site/a/<slug> (null = page off)
+  tagline       String?              // one line, agent voice
+  openTo        String[]             // e.g. ["fractional-cto","advisory"]
+  notOpenTo     String[]             // e.g. ["full-time"]
+  capacity      String?              // free-text, owner-edited
+  publicReceipts Json?               // [{title, detail, coSigners}] owner-curated for v0.1
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Thread {
+  id         String    @id @default(cuid())
+  userId     String
+  title      String    @default("New thread")
+  createdAt  DateTime  @default(now())
+  // Intake (public page) fields — source "intake" threads are quarantined until the owner decides
+  source      String  @default("owner")  // owner | email | intake
+  peerName    String?
+  peerEmail   String?
+  status      String  @default("open")   // open | awaiting_owner | closed
+  publicToken String? @unique            // unguessable guest-view URL token (7-day expiry)
+  messages  Message[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id       String  @id @default(cuid())
+  threadId String
+  role     String  // user | assistant | tool
+  content  String  @db.Text
+  thread   Thread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+model Routine {  // toggleable background automations
+  id        String   @id @default(cuid())
+  userId    String
+  key       String   // auto-inbox | morning-briefing | meeting-briefing | loose-ends
+  enabled   Boolean  @default(false)
+  config    Json?
+  lastRunAt DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, key])
+}
+
+model Integration {
+  id         String  @id @default(cuid())
+  userId     String
+  provider   String  // google | microsoft | slack | notion | github ...
+  scopes     String?
+  connected  Boolean @default(true)
+  @@unique([userId, provider])
+}
+
+model WikiPage {  // auto-built personal wiki
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Person {  // key contacts with background profiles
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  email     String?
+  notes     String   @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id       String  @id @default(cuid())
+  userId   String
+  content  String  @db.Text
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Doc {  // library files
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  kind      String   @default("document")
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

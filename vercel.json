@@ -1,0 +1,8 @@
+{
+  "crons": [
+    { "path": "/api/routines/run?key=morning-briefing",  "schedule": "0 6 * * *" },
+    { "path": "/api/routines/run?key=auto-inbox",        "schedule": "*/20 * * * *" },
+    { "path": "/api/routines/run?key=loose-ends",        "schedule": "30 16 * * 1-5" },
+    { "path": "/api/routines/run?key=meeting-briefing",  "schedule": "0 * * * *" }
+  ]
+}

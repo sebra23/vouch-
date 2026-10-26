@@ -1,0 +1,5 @@
+[build]
+  command = "npm run build"
+
+[functions]
+  # scheduled functions live in netlify/functions/*.mts
