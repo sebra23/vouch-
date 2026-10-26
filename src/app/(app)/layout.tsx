@@ -7,6 +7,7 @@ import AccountMenu from "@/components/account-menu";
 import Search from "@/components/search";
 
 const NAV = [
+  ["Jobs for you", "/jobs"], ["Matches", "/matches"], ["Hiring", "/hire"],
   ["Chat", "/chat"], ["For you", "/for-you"], ["Powers", "/powers/routines"],
   ["Explore", "/explore"], ["Wiki", "/wiki"], ["Library", "/library"],
   ["Teams", "/teams"], ["Shared with me", "/shared"], ["Referrals", "/referrals"], ["Pricing", "/pricing"],

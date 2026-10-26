@@ -27,6 +27,7 @@ model User {
   notes         Note[]
   docs          Doc[]
   logs          AppLog[]
+  jobs          Job[]
 }
 
 model AppLog {
@@ -102,6 +103,38 @@ model Message {
   role     String  // user | assistant | tool
   content  String  @db.Text
   thread   Thread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+// ---- Jobs marketplace (Vouch) ----
+
+model Job {
+  id          String   @id @default(cuid())
+  userId      String   // employer
+  company     String
+  title       String
+  description String   @db.Text
+  rate        String?  // free-text: "€140/h"
+  commitment  String?  // "12h/wk"
+  location    String?
+  industry    String?  // matching key vs candidate openTo tags
+  status      String   @default("open") // open | filled | closed
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches     Match[]
+}
+
+model Match {
+  id             String    @id @default(cuid())
+  jobId          String
+  candidateId    String    // user id of the candidate
+  jobOwnerId     String    // employer user id (denormalized for owner queries)
+  candidateState String    @default("none") // none | interested | passed
+  employerState  String    @default("none") // none | interested | passed
+  matchedAt      DateTime?
+  threadId       String?   @unique
+  createdAt      DateTime  @default(now())
+  job            Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  @@unique([jobId, candidateId])
 }
 
 model Routine {  // toggleable background automations

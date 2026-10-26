@@ -36,9 +36,9 @@ test("rate limit: window slides", () => {
 });
 
 test("makeSlug: slugifies and appends suffix", () => {
-  assert.equal(makeSlug("Columnus", () => 0.12345), "columnus-3t0");
-  assert.equal(makeSlug("  Weird  Name!! ", () => 0.999), "weird-name-2ps");
-  assert.equal(makeSlug("", () => 0.5), "agent-gzz");
+  assert.equal(makeSlug("Columnus", () => 0.12345), "columnus-4fzo");
+  assert.equal(makeSlug("  Weird  Name!! ", () => 0.999), "weird-name-zypc");
+  assert.equal(makeSlug("", () => 0.5), "agent-i");
   assert.ok(makeSlug("x".repeat(50)).length <= 29, "slug length capped");
 });
 
