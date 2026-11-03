@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth/options";
 import { prisma } from "@/lib/db";
 import AccountMenu from "@/components/account-menu";
 import Search from "@/components/search";
+import { MobileNav } from "./nav-client";
 
 const NAV: [string, string, string][] = [
   // group, label, href — primary surface per the four-page architecture
@@ -14,6 +15,8 @@ const NAV: [string, string, string][] = [
   ["Account", "Settings", "/settings"], ["Account", "Pricing", "/pricing"],
 ];
 
+const NAV_ENTRIES = NAV.map(([group, label, href]) => ({ group, label, href }));
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
@@ -21,8 +24,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     select: { creditsBalance: true, plan: true, onboardingDone: true, email: true } });
   if (user && !user.onboardingDone) redirect("/onboarding");
   return (
-    <div className="flex h-screen">
-      <aside className="w-56 shrink-0 border-r p-4 flex flex-col gap-1 transition-v"
+    <div className="flex h-screen flex-col md:flex-row">
+      {/* mobile: top bar + drawer */}
+      <MobileNav entries={NAV_ENTRIES} brand="Vouch" />
+
+      {/* desktop sidebar */}
+      <aside className="hidden w-56 shrink-0 flex-col gap-1 border-r p-4 transition-v md:flex"
         style={{ background: "var(--card)", borderColor: "var(--line)" }}>
         <div className="mb-3 font-semibold" style={{ color: "var(--graphite)" }}>Vouch</div>
         {(["Vouch", "Agent", "More", "Account"] as const).map(g => (
