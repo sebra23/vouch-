@@ -85,7 +85,7 @@ export default async function NetworkPage() {
       <h2 className="mt-10 text-sm font-medium" style={{ color: "var(--ink-2)" }}>Companies worth knowing</h2>
       <div className="mt-3 grid grid-cols-2 gap-3">
         {companies.map(c => (
-          <Link key={c.id} href={`/c/${c.slug}`} className="card transition-v hover:border-[var(--ink-3)] block">
+          <Link key={c.id} href={`/c/${c.slug}`} className="card card-interactive block">
             <div className="flex items-center justify-between">
               <p className="font-medium">{c.name}</p>
               {c.verified && <span className="chip chip-verified">verified</span>}

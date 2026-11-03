@@ -72,49 +72,124 @@ h1, .h-display { letter-spacing: -0.02em; }
 .text-display  { font-size: 84px; line-height: 0.8; letter-spacing: -2.52px; font-weight: 900; text-transform: uppercase; }
 .h-page { font-size: 28px; line-height: 1.1; letter-spacing: -0.476px; font-weight: 400; }
 
-/* Semantic components */
-.btn-primary {
-  @apply font-medium transition-all;
-  background: var(--ink); color: #fff; border-radius: 8px;
-  padding: 12px 16px; font-size: 16px; font-weight: 400;
-}
-.btn-primary:hover { background: #2a2a2a; }
-.btn-ghost {
-  @apply font-medium transition-all;
-  background: transparent; color: var(--ink); border-radius: 8px;
-  border: 1px solid var(--line); padding: 12px 16px; font-size: 16px; font-weight: 400;
-}
-.btn-ghost:hover { background: var(--pearl); }
-.btn-neutral { background: var(--pearl); color: var(--ink); border-radius: 8px; padding: 12px 16px; font-weight: 400; }
-.btn-neutral:hover { background: var(--stone); color: #fff; }
+/* ═══════════════════════════════════════════════════════
+   Material Design component layer (M3 grammar, Vouch palette)
+   — state layers, elevation, shape, focus rings
+   ═══════════════════════════════════════════════════════ */
 
-.card {
-  background: var(--canvas); border: 1px solid var(--line);
-  border-radius: 12px; padding: 20px;
+/* Elevation (Material tonal levels mapped onto our shadows) */
+.e1 { box-shadow: var(--shadow-subtle-3); }
+.e2 { box-shadow: 0 1px 2px rgba(17,17,17,0.06), 0 2px 8px rgba(17,17,17,0.05); }
+.e3 { box-shadow: var(--shadow-xl); }
+
+/* State layer utility (M3: hover 8% ink, press 12%) */
+.state-layer { position: relative; overflow: hidden; isolation: isolate; }
+.state-layer::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: currentColor; opacity: 0; transition: opacity 150ms ease-out;
+  border-radius: inherit; pointer-events: none;
 }
+.state-layer:hover::after { opacity: 0.08; }
+.state-layer:active::after { opacity: 0.12; }
+
+/* Buttons — M3 filled / outlined / tonal / text */
+.btn-primary {
+  @apply font-medium transition-v inline-flex items-center justify-center gap-2 select-none;
+  background: var(--ink); color: #fff; border-radius: 10px;
+  padding: 12px 20px; font-size: 15px; font-weight: 500;
+}
+.btn-primary:hover { box-shadow: var(--shadow-subtle-2); background: #000; }
+.btn-primary:active { box-shadow: none; transform: scale(0.985); }
+.btn-ghost {
+  @apply font-medium transition-v inline-flex items-center justify-center gap-2 select-none;
+  background: transparent; color: var(--ink); border-radius: 10px;
+  border: 1px solid var(--line); padding: 12px 20px; font-size: 15px; font-weight: 500;
+}
+.btn-ghost:hover { background: rgba(17,17,17,0.05); }
+.btn-ghost:active { background: rgba(17,17,17,0.09); transform: scale(0.985); }
+.btn-neutral {
+  @apply font-medium transition-v inline-flex items-center justify-center gap-2 select-none;
+  background: var(--cream-wash); color: var(--ink); border-radius: 10px;
+  padding: 12px 20px; font-size: 15px; font-weight: 500;
+}
+.btn-neutral:hover { background: var(--pearl); }
+.btn-neutral:active { transform: scale(0.985); }
+.btn-text {
+  @apply font-medium transition-v inline-flex items-center justify-center select-none;
+  background: transparent; color: var(--ink); border-radius: 10px;
+  padding: 12px 16px; font-size: 15px; font-weight: 500;
+}
+.btn-text:hover { background: rgba(17,17,17,0.06); }
+.btn-text:active { background: rgba(17,17,17,0.1); }
+
+/* Keyboard focus rings (M3 focus indicator) */
+.btn-primary:focus-visible, .btn-ghost:focus-visible, .btn-neutral:focus-visible,
+.btn-text:focus-visible, .input:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--ink); outline-offset: 2px;
+}
+
+/* Cards — M3 elevated (default), filled, outlined */
+.card {
+  background: var(--canvas);
+  border: 1px solid rgba(17,17,17,0.05);
+  border-radius: var(--radius-cards);
+  padding: 20px;
+  box-shadow: var(--shadow-subtle-3);          /* M3 level-1 elevation */
+  transition: box-shadow var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+/* Interactive cards: lift + deepen on hover, press sinks */
+.card-interactive { cursor: pointer; }
+.card-interactive:hover { box-shadow: var(--shadow-xl); transform: translateY(-1px); }
+.card-interactive:active { box-shadow: var(--shadow-subtle-3); transform: translateY(0) scale(0.995); }
+/* Filled variant: no elevation, surface tint */
+.card-filled { background: var(--cream-wash); border-color: transparent; box-shadow: none; }
+/* Outlined variant: flat, hairline only */
+.card-outlined { box-shadow: none; border-color: var(--line); }
+
+/* Pastel taxonomy tiles — flat per system, press feedback only */
 .tile-pink { background: var(--petal-pink); }
 .tile-mint { background: var(--mint-green); }
 .tile-canary { background: var(--canary-yellow); }
 .tile-violet { background: var(--soft-violet); }
 .tile-aqua { background: var(--aqua); }
+[class*="tile-"] { transition: transform var(--t-fast) var(--ease-out), filter var(--t-fast) var(--ease-out); }
+[class*="tile-"]:active { transform: scale(0.98); filter: brightness(0.97); }
 
+/* Tags & chips — M3 filter-chip grammar */
 .tag {
-  @apply inline-flex items-center rounded-full font-medium;
-  font-size: 12px; padding: 2px 10px;
+  @apply inline-flex items-center rounded-full font-medium select-none;
+  font-size: 12px; padding: 3px 10px;
   background: var(--soft-violet); color: var(--ink);
+  border: 1px solid transparent;
 }
-.chip { @apply inline-flex items-center rounded-full font-medium; font-size: 12px; padding: 2px 8px; background: var(--cream-wash); color: var(--ash); }
-.chip-verified { background: var(--success-soft); color: var(--success); }
-.chip-inbound { background: var(--inbound-soft); color: var(--inbound); }
+.chip {
+  @apply inline-flex items-center rounded-full font-medium select-none;
+  font-size: 12px; padding: 3px 10px;
+  background: var(--cream-wash); color: var(--ash);
+  border: 1px solid rgba(17,17,17,0.06);
+  transition: background var(--t-fast) ease-out;
+}
+.chip-interactive { cursor: pointer; }
+.chip-interactive:hover { background: var(--pearl); }
+.chip-interactive:active { transform: scale(0.96); }
+.chip-verified { background: var(--success-soft); color: var(--success); border-color: transparent; }
+.chip-inbound { background: var(--inbound-soft); color: var(--inbound); border-color: transparent; }
 
+/* Inputs — M3 outlined text field */
 .input {
-  @apply outline-none transition-all;
-  background: var(--canvas); border: 1px solid var(--line); border-radius: 12px;
+  @apply outline-none transition-v;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-inputs);
   padding: 0 16px; height: 48px; color: var(--ink); font-size: 16px;
 }
 .input::placeholder { color: var(--stone); }
-.input:focus { border-color: var(--ink); }
+.input:hover { border-color: var(--stone); }
+.input:focus, .input:focus-visible { border-color: var(--ink); border-width: 1.5px; outline: none; }
 textarea.input { height: auto; padding: 12px 16px; font-size: 15px; }
+/* Filled input variant */
+.input-filled { background: var(--cream-wash); border-color: transparent; }
+.input-filled:focus, .input-filled:focus-visible { background: var(--canvas); border-color: var(--ink); }
 
 .avt { width: 40px; height: 40px; border-radius: 10px; background: var(--cream-wash);
   display: flex; align-items: center; justify-content: center; font-weight: 500; color: var(--ink); }
