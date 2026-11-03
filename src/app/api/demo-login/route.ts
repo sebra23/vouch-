@@ -4,6 +4,32 @@ import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+// Demo personas available in the user-switcher (demo mode only)
+const DEMO_EMAILS = new Set(["demo@ari.local", "lena@vouch.demo", "amara@vouch.demo"]);
+
+function sessionResponse(req: Request, userId: string, email: string, name: string) {
+  return encode({ token: { sub: userId, email, name },
+    secret: process.env.NEXTAUTH_SECRET!, maxAge: 30 * 24 * 3600 })
+    .then(token => {
+      const res = NextResponse.redirect(new URL("/today", req.url));
+      const secure = new URL(req.url).protocol === "https:";
+      const name_ = secure ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+      res.cookies.set(name_, token, { httpOnly: true, sameSite: "lax", path: "/", secure });
+      return res;
+    });
+}
+
+// POST /api/demo-login { email } — switch demo persona (demo mode only)
+export async function POST(req: Request) {
+  if (process.env.NEXT_PUBLIC_DEMO !== "1") return NextResponse.json({ error: "demo mode off" }, { status: 403 });
+  const j = await req.json().catch(() => null);
+  const email = String(j?.email ?? "");
+  if (!DEMO_EMAILS.has(email)) return NextResponse.json({ error: "not a demo persona" }, { status: 400 });
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return NextResponse.json({ error: "persona missing" }, { status: 404 });
+  return sessionResponse(req, user.id, user.email, user.name ?? "");
+}
+
 export async function GET(req: Request) {
   if (process.env.NEXT_PUBLIC_DEMO !== "1") return NextResponse.redirect(new URL("/login", req.url));
   let demo = await prisma.user.findUnique({ where: { email: "demo@ari.local" } });
@@ -30,12 +56,5 @@ export async function GET(req: Request) {
       { threadId: demoThread.id, role: "assistant", content: "Thanks, Alex. A few quick questions so I can see if this is a fit: what's the team size today, and is the pivot already funded or still being raised?" },
     ] });
   }
-  const token = await encode({ token: { sub: demo.id, email: demo.email, name: demo.name },
-    secret: process.env.NEXTAUTH_SECRET!, maxAge: 30 * 24 * 3600 });
-  const res = NextResponse.redirect(new URL("/chat", req.url));
-  // NextAuth uses the __Secure- prefixed cookie on https/production
-  const secure = new URL(req.url).protocol === "https:";
-  const name = secure ? "__Secure-next-auth.session-token" : "next-auth.session-token";
-  res.cookies.set(name, token, { httpOnly: true, sameSite: "lax", path: "/", secure });
-  return res;
+  return sessionResponse(req, demo.id, demo.email, demo.name ?? "");
 }

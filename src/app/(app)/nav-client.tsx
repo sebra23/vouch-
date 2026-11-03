@@ -1,25 +1,29 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import UserSwitcher, { type Persona } from "./user-switcher";
 
 export type NavEntry = { group: string; label: string; href: string };
 
-export function MobileNav({ entries, brand }: { entries: NavEntry[]; brand: string }) {
+export function MobileNav({ entries, brand, personas = [], current = "" }: { entries: NavEntry[]; brand: string; personas?: Persona[]; current?: string }) {
   const [open, setOpen] = useState(false);
   const groups = [...new Set(entries.map(e => e.group))];
 
   return (
     <>
       {/* top bar (mobile only) */}
-      <div className="flex items-center justify-between border-b px-4 py-3 md:hidden"
+      <div className="flex items-center justify-between gap-2 border-b px-4 py-3 md:hidden"
         style={{ borderColor: "var(--line)", background: "var(--canvas)" }}>
         <Link href="/today" className="text-lg font-medium" style={{ letterSpacing: "-0.02em" }}>{brand}</Link>
-        <button onClick={() => setOpen(true)} aria-label="Open menu"
+        <div className="flex items-center gap-2">
+          {personas.length > 0 && <UserSwitcher personas={personas} current={current} />}
+          <button onClick={() => setOpen(true)} aria-label="Open menu"
           className="rounded-lg p-2" style={{ border: "1px solid var(--line)" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M3 6h14M3 10h14M3 14h14" stroke="var(--ink)" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
         </button>
+        </div>
       </div>
 
       {/* drawer */}

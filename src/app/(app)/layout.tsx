@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import AccountMenu from "@/components/account-menu";
 import Search from "@/components/search";
 import { MobileNav } from "./nav-client";
+import UserSwitcher, { type Persona } from "./user-switcher";
 
 const NAV: [string, string, string][] = [
   // group, label, href — primary surface per the four-page architecture
@@ -23,10 +24,23 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await prisma.user.findUnique({ where: { id: (session as any).userId! },
     select: { creditsBalance: true, plan: true, onboardingDone: true, email: true } });
   if (user && !user.onboardingDone) redirect("/onboarding");
+
+  // demo personas for the user switcher (demo mode only)
+  const demoEmails = ["demo@ari.local", "lena@vouch.demo", "amara@vouch.demo"];
+  const personaMeta: Record<string, { role: string; tile: string }> = {
+    "demo@ari.local": { role: "Candidate · fractional CTO", tile: "var(--soft-violet)" },
+    "lena@vouch.demo": { role: "Employer · Nordfintech", tile: "var(--mint-green)" },
+    "amara@vouch.demo": { role: "Candidate · staff engineer", tile: "var(--petal-pink)" },
+  };
+  const personas: Persona[] = process.env.NEXT_PUBLIC_DEMO === "1"
+    ? (await prisma.user.findMany({ where: { email: { in: demoEmails } } }))
+        .map(u => ({ email: u.email, name: u.name ?? u.email, role: personaMeta[u.email]?.role ?? "Demo", tile: personaMeta[u.email]?.tile ?? "var(--pearl)" }))
+    : [];
+
   return (
     <div className="flex h-screen flex-col md:flex-row">
       {/* mobile: top bar + drawer */}
-      <MobileNav entries={NAV_ENTRIES} brand="Vouch" />
+      <MobileNav entries={NAV_ENTRIES} brand="Vouch" personas={personas} current={user?.email ?? ""} />
 
       {/* desktop sidebar */}
       <aside className="hidden w-56 shrink-0 flex-col gap-1 border-r p-4 transition-v md:flex"
@@ -42,7 +56,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         ))}
         <Search />
-        <div className="mt-auto">
+        <div className="mt-auto space-y-2">
+          {personas.length > 0 && <UserSwitcher personas={personas} current={user?.email ?? ""} />}
           <AccountMenu email={user?.email ?? ""} plan={user?.plan ?? "free"}
                        credits={user?.creditsBalance ?? 0}
                        trialPct={Math.max(0, Math.min(100, Math.round(((user?.creditsBalance ?? 0) / 5000) * 100)))} />
