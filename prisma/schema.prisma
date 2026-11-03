@@ -199,6 +199,9 @@ model Match {
   jobOwnerId     String    // employer user id (denormalized for owner queries)
   candidateState String    @default("none") // none | interested | passed
   employerState  String    @default("none") // none | interested | passed
+  // Funnel: matched → screening → interview → offer → hired (declined exits)
+  stage          String    @default("matched")
+  stageNotes     String?   @db.Text   // agent summary at current stage
   matchedAt      DateTime?
   threadId       String?   @unique
   createdAt      DateTime  @default(now())
