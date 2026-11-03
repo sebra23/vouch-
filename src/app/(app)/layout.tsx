@@ -11,7 +11,7 @@ const NAV: [string, string, string][] = [
   ["Vouch", "Today", "/today"], ["Vouch", "Jobs", "/jobs"], ["Vouch", "Network", "/network"], ["Vouch", "Wiki", "/wiki"],
   ["Agent", "Chat", "/chat"], ["Agent", "Activity", "/logs"], ["Agent", "For you", "/for-you"],
   ["More", "Matches", "/matches"], ["More", "Hiring", "/hire"], ["More", "Powers", "/powers/routines"],
-  ["Account", "Agent settings", "/settings"], ["Account", "Pricing", "/pricing"],
+  ["Account", "Settings", "/settings"], ["Account", "Pricing", "/pricing"],
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

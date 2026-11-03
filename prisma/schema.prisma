@@ -136,12 +136,14 @@ model Integration {
 }
 
 model WikiPage {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  content   String   @db.Text
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  userId     String
+  kind       String   @default("note") // bio | goal | project | reference | cv | note
+  title      String
+  content    String   @db.Text
+  provenance String   @default("self-declared") // imported | self-declared | verified
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Person {
