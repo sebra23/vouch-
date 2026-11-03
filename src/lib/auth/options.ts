@@ -15,6 +15,9 @@ export const authOptions: NextAuthOptions = {
         scope: "openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/calendar.readonly",
         access_type: "offline", prompt: "consent",
       }},
+      // Google has already verified the email it returns; allow linking to an
+      // existing same-email account instead of failing with OAuthAccountNotLinked.
+      allowDangerousEmailAccountLinking: true,
     }),
     AzureADProvider({
       clientId: process.env.MICROSOFT_CLIENT_ID!,

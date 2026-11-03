@@ -42,6 +42,14 @@ export async function POST(req: Request) {
     await prisma.message.create({ data: { threadId: cThread.id, role: "assistant",
       content: `You matched with ${match.job.company} on "${match.job.title}". Your assistant will coordinate scheduling — share your availability here.` } });
     await log(match.jobOwnerId, "system", `New match: ${candidate?.name ?? "candidate"} for ${match.job.title}`);
+    await prisma.interaction.create({ data: {
+      initiatorId: match.jobOwnerId, recipientId: match.candidateId, type: "match",
+      summary: `Mutual match on "${match.job.title}" — assistants are coordinating a time`, status: "accepted" } });
+  }
+  if (j.state === "passed") {
+    await prisma.interaction.create({ data: {
+      initiatorId: match.jobOwnerId, recipientId: match.candidateId, type: "reply",
+      summary: `The company passed on "${match.job.title}" — invisible to the candidate`, status: "declined" } });
   }
   return NextResponse.json({ ok: true, matched: nowMatched, threadId: nowMatched ? threadId : null });
 }

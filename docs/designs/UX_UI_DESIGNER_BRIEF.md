@@ -35,24 +35,24 @@ thumb?" with a concrete, legible reason.
 ## 3. Hard rules (violating these = redesign, not discussion)
 
 1. **No engagement addiction mechanics.** No infinite scroll, no follower
-   counts, no view counts, no "someone searched you," no streaks. Lists end;
-   empty states say when the next batch arrives ("new matches land as roles
-   open").
+counts, no view counts, no "someone searched you," no streaks. Lists end;
+empty states say when the next batch arrives ("new matches land as roles
+open").
 2. **One primary action per screen.** Amber is reserved for that action and
-   that action only (see §5).
+that action only (see §5).
 3. **A swipe pass is always invisible.** Candidates never see a no; employers
-   never see their own passes announced.
+never see their own passes announced.
 4. **Every notification is an event, not content.** Match, reply, payment,
-   receipt. If nothing real happened, the user hears nothing. Notifications are
-   batched to a daily digest plus red-tier "needs you" cards.
+receipt. If nothing real happened, the user hears nothing. Notifications are
+batched to a daily digest plus red-tier "needs you" cards.
 5. **No raw candidate↔employer chat before match.** Pre-match, all contact is
-   agent-mediated; post-match, each party talks with their own assistant in
-   their own thread.
+agent-mediated; post-match, each party talks with their own assistant in
+their own thread.
 6. **Verified vs. self-declared is always visually distinct.** Green chip =
-   confirmed by the other party. Neutral chip = self-declared. Never blend.
+confirmed by the other party. Neutral chip = self-declared. Never blend.
 7. **GDPR/EU AI Act posture:** no fully automated rejection of a human; every
-   pass/decline is a human tap on an agent's recommendation; AI involvement is
-   disclosed; users can request human review.
+pass/decline is a human tap on an agent's recommendation; AI involvement is
+disclosed; users can request human review.
 
 ## 4. Product flows (the three loops)
 
@@ -74,17 +74,17 @@ reviewable decision card on the employer side → approve = intro.
 Full spec: `docs/designs/town_reference_design_system.md`.
 
 - Surfaces: warm cream `#F7F4EE` background, white cards, hairline borders
-  (`#E7E3DA`). **No drop shadows — flat and calm.**
+(`#E7E3DA`). **No drop shadows — flat and calm.**
 - Ink: `#1A1A1C` primary, `#6E6E73` secondary, `#9C9CA1` tertiary.
 - **One accent:** amber `#F5A524`, reserved for the single primary action per
-  screen + "needs you" emphasis (1px amber border, never a bigger shadow).
+screen + "needs you" emphasis (1px amber border, never a bigger shadow).
 - Functional: success `#2E9E6B` (verified, matched, money released only);
-  danger `#D94848` (rare); purple `#8B7CF6` (inbound/reached-out badge only).
+danger `#D94848` (rare); purple `#8B7CF6` (inbound/reached-out badge only).
 - Type: Inter, weights 400/500/600 only. Sentence case everywhere. Numbers in
-  tabular figures (rates, counts).
+tabular figures (rates, counts).
 - Grid: 4pt, single column, max content width 560–640px. Motion 150–200ms
-  ease-out; swipe cards spring. No parallax, no confetti — matches are
-  celebrated with information, not animation.
+ease-out; swipe cards spring. No parallax, no confetti — matches are
+celebrated with information, not animation.
 - Dark mode: full parity, graphite `#1F1F22` base. Not an afterthought.
 
 ## 6. Screen inventory
@@ -116,6 +116,7 @@ speak in first person with a one-line personality. Humor is allowed in empty
 states, never in money or rejection moments.
 
 Reference copy that is already decided and must not drift:
+
 - "invisible to your employer"
 - "if you pass, they never know"
 - "the agent replies today. seb only appears if it's a fit."
@@ -124,16 +125,16 @@ Reference copy that is already decided and must not drift:
 ## 8. What we want from you
 
 1. **Audit the live screens** against §3–§6 and return a defect list ranked by
-   severity (blocker / confusing / polish).
+severity (blocker / confusing / polish).
 2. **Design the three highest-friction screens to final quality** as a
-   reference standard: Jobs-for-you stack, match moment, contract & payments.
+reference standard: Jobs-for-you stack, match moment, contract & payments.
 3. **Empty/edge states** for every list (no matches yet, no jobs yet, no
-   receipts yet, pending employer response) — these carry the product's
-   personality.
+receipts yet, pending employer response) — these carry the product's
+personality.
 4. **The week-in-motion card** — our replacement for the feed; it must earn a
-   Monday open without a single engagement trick.
+Monday open without a single engagement trick.
 5. Accessibility: WCAG AA contrast on all token pairs; every action reachable
-   by keyboard; motion respects reduced-motion.
+by keyboard; motion respects reduced-motion.
 
 Deliverables: Figma (or equivalent) + a written rationale per screen that maps
 every element back to a rule in §3. Anything in your designs that breaks a

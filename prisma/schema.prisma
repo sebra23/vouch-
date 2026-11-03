@@ -1,39 +1,42 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  image         String?
-  timezone      String    @default("Europe/Zurich")
-  onboardingDone Boolean  @default(false)
-  plan          String    @default("free")
-  creditsBalance Int     @default(5000)  // trial credits
-  trialEndsAt   DateTime?
-  preferences   Json?     // scheduling prefs, theme, channels
-  accounts      Account[]
-  sessions      Session[]
-  assistant     Assistant?
-  threads       Thread[]
-  routines      Routine[]
-  wikiPages     WikiPage[]
-  people        Person[]
-  notes         Note[]
-  docs          Doc[]
-  logs          AppLog[]
-  jobs          Job[]
+  id             String     @id @default(cuid())
+  email          String     @unique
+  emailVerified  DateTime? // required by NextAuth PrismaAdapter
+  name           String?
+  image          String?
+  timezone       String     @default("Europe/Zurich")
+  onboardingDone Boolean    @default(false)
+  plan           String     @default("free")
+  creditsBalance Int        @default(5000) // trial credits
+  trialEndsAt    DateTime?
+  preferences    Json? // scheduling prefs, theme, channels
+  accounts       Account[]
+  sessions       Session[]
+  assistant      Assistant?
+  threads        Thread[]
+  routines       Routine[]
+  wikiPages      WikiPage[]
+  people         Person[]
+  notes          Note[]
+  docs           Doc[]
+  logs           AppLog[]
+  jobs           Job[]
+  companies      Company[]
 }
 
 model AppLog {
   id        String   @id @default(cuid())
   userId    String
-  source    String   // routine | chat | inbound | system
+  source    String // routine | chat | inbound | system
   message   String   @db.Text
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -41,35 +44,40 @@ model AppLog {
   @@index([userId, createdAt])
 }
 
-model Account {  // OAuth account (Google / Microsoft)
+model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
-  provider          String  // "google" | "azure-ad"
+  provider          String // "google" | "azure-ad"
   providerAccountId String
   access_token      String? @db.Text
   refresh_token     String? @db.Text
-  expires_at        Int?
-  scope             String?
+  expires_at              Int?
+  refresh_token_expires_in Int?
+  token_type              String?
+  scope                   String?
+  id_token                String? @db.Text
+  session_state           String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  sessionToken String @unique
-  userId    String
-  expires   DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Assistant {  // the "Townie" equivalent
+model Assistant {
   id          String  @id @default(cuid())
   userId      String  @unique
   name        String  @default("Assistant")
-  slug        String  @unique   // name@ourdomain.com
+  slug        String  @unique // name@ourdomain.com
   personality String  @default("Minimal, high-signal, and brief.")
-  avatar      String  @default("neutral")  // our own icon set, not Town's art
+  avatar      String  @default("neutral") // our own icon set, not Town's art
   voiceName   String?
   // Public agent profile (Vouch page) — see docs/PUBLIC_AGENT_PROFILE.md
   isPublic      Boolean @default(false)
@@ -98,11 +106,68 @@ model Thread {
 }
 
 model Message {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   threadId String
-  role     String  // user | assistant | tool
-  content  String  @db.Text
-  thread   Thread  @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role     String // user | assistant | tool
+  content  String @db.Text
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+model Routine {
+  id        String    @id @default(cuid())
+  userId    String
+  key       String // auto-inbox | morning-briefing | meeting-briefing | loose-ends
+  enabled   Boolean   @default(false)
+  config    Json?
+  lastRunAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+}
+
+model Integration {
+  id        String  @id @default(cuid())
+  userId    String
+  provider  String // google | microsoft | slack | notion | github ...
+  scopes    String?
+  connected Boolean @default(true)
+
+  @@unique([userId, provider])
+}
+
+model WikiPage {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Person {
+  id     String  @id @default(cuid())
+  userId String
+  name   String
+  email  String?
+  notes  String  @db.Text
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id      String @id @default(cuid())
+  userId  String
+  content String @db.Text
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Doc {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  kind      String   @default("document")
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ---- Jobs marketplace (Vouch) ----
@@ -110,6 +175,7 @@ model Message {
 model Job {
   id          String   @id @default(cuid())
   userId      String   // employer
+  companyId   String?
   company     String
   title       String
   description String   @db.Text
@@ -121,6 +187,7 @@ model Job {
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   matches     Match[]
+  companyRef  Company? @relation(fields: [companyId], references: [id])
 }
 
 model Match {
@@ -137,57 +204,33 @@ model Match {
   @@unique([jobId, candidateId])
 }
 
-model Routine {  // toggleable background automations
-  id        String   @id @default(cuid())
-  userId    String
-  key       String   // auto-inbox | morning-briefing | meeting-briefing | loose-ends
-  enabled   Boolean  @default(false)
-  config    Json?
-  lastRunAt DateTime?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([userId, key])
+// ---- Company entity (first-class, per spec §5) ----
+
+model Company {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  website     String?
+  industry    String?
+  size        String?
+  location    String?
+  ownerId     String   // human who registered/verified
+  verified    Boolean  @default(false) // domain/authority verified
+  createdAt   DateTime @default(now())
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  jobs        Job[]
 }
 
-model Integration {
-  id         String  @id @default(cuid())
-  userId     String
-  provider   String  // google | microsoft | slack | notion | github ...
-  scopes     String?
-  connected  Boolean @default(true)
-  @@unique([userId, provider])
-}
+// ---- Agent-to-agent interactions (Network page source of truth) ----
 
-model WikiPage {  // auto-built personal wiki
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  content   String   @db.Text
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Person {  // key contacts with background profiles
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  email     String?
-  notes     String   @db.Text
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Note {
-  id       String  @id @default(cuid())
-  userId   String
-  content  String  @db.Text
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Doc {  // library files
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  kind      String   @default("document")
-  content   String?  @db.Text
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Interaction {
+  id           String   @id @default(cuid())
+  initiatorId  String   // userId whose agent acted
+  recipientId  String   // userId/company-owner whose agent received
+  companyId    String?  // company context, when applicable
+  type         String   // outreach | intro_request | reply | match | screen | schedule
+  summary      String   @db.Text
+  status       String   @default("open") // open | accepted | declined | completed
+  createdAt    DateTime @default(now())
 }

@@ -20,8 +20,7 @@ export default async function ReferralsPage() {
       <div className="mt-6 rounded-xl border bg-white p-5">
         <div className="text-sm font-medium">Share your referral link</div>
         <div className="mt-2 flex gap-2">
-          <input readOnly value={link} className="flex-1 rounded-lg border bg-neutral-50 px-3 py-2 text-sm text-neutral-600"
-            onFocus={e => e.target.select()} />
+          <input readOnly value={link} className="flex-1 rounded-lg border bg-neutral-50 px-3 py-2 text-sm text-neutral-600" />
           <CopyButton value={link} />
         </div>
         <p className="mt-3 text-xs text-neutral-400">

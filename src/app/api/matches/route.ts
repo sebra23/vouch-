@@ -23,5 +23,13 @@ export async function POST(req: Request) {
     update: { candidateState: j.state },
     create: { jobId: job.id, candidateId: userId, jobOwnerId: job.userId, candidateState: j.state },
   });
+  if (j.state === "interested") {
+    // Network page: record the agent-to-agent exchange
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+    await prisma.interaction.create({ data: {
+      initiatorId: userId, recipientId: job.userId, type: "intro_request",
+      summary: `${me?.name ?? "A candidate"} is interested in "${job.title}" — awaiting the company's response`,
+      status: "open" } });
+  }
   return NextResponse.json({ ok: true, state: match.candidateState, employerState: match.employerState });
 }

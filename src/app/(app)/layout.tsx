@@ -7,12 +7,11 @@ import AccountMenu from "@/components/account-menu";
 import Search from "@/components/search";
 
 const NAV: [string, string, string][] = [
-  // group, label, href
-  ["Work", "Jobs for you", "/jobs"], ["Work", "Matches", "/matches"], ["Work", "Hiring", "/hire"],
-  ["Assistant", "Chat", "/chat"], ["Assistant", "For you", "/for-you"], ["Assistant", "Activity", "/logs"], ["Assistant", "Powers", "/powers/routines"], ["Assistant", "Explore", "/explore"],
-  ["Knowledge", "Wiki", "/wiki"], ["Knowledge", "Library", "/library"],
-  ["Teams", "Teams", "/teams"], ["Teams", "Shared with me", "/shared"], ["Teams", "Referrals", "/referrals"],
-  ["Account", "Settings", "/settings"], ["Account", "Pricing", "/pricing"],
+  // group, label, href — primary surface per the four-page architecture
+  ["Vouch", "Today", "/today"], ["Vouch", "Jobs", "/jobs"], ["Vouch", "Network", "/network"], ["Vouch", "Wiki", "/wiki"],
+  ["Agent", "Chat", "/chat"], ["Agent", "Activity", "/logs"], ["Agent", "For you", "/for-you"],
+  ["More", "Matches", "/matches"], ["More", "Hiring", "/hire"], ["More", "Powers", "/powers/routines"],
+  ["Account", "Agent settings", "/settings"], ["Account", "Pricing", "/pricing"],
 ];
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -26,7 +25,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <aside className="w-56 shrink-0 border-r p-4 flex flex-col gap-1 transition-v"
         style={{ background: "var(--card)", borderColor: "var(--line)" }}>
         <div className="mb-3 font-semibold" style={{ color: "var(--graphite)" }}>Vouch</div>
-        {(["Work", "Assistant", "Knowledge", "Teams", "Account"] as const).map(g => (
+        {(["Vouch", "Agent", "More", "Account"] as const).map(g => (
           <div key={g} className="mt-2 first:mt-0">
             <p className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--ink-3)" }}>{g}</p>
             {NAV.filter(([, , href]) => NAV.find(n => n[0] === g && n[2] === href)).filter(n => n[0] === g)
